@@ -10,74 +10,81 @@ import java.io.File;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byName;
 import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.*;
 
-public class PracticeFormTest {
+public class PracticeFormTest extends TestBase {
 
-    @BeforeAll
-    static void setup() {
-        Configuration.startMaximized = true;
-    }
+    String firstName = "Dmitry",
+            lastName = "Rejman",
+            userEmail = "bgdt@gmail.com",
+            userNumber = "9527776556",
+            userGender = "Male",
+            userSubjects = "Computer Science",
+            userHobbies = "Sports",
+            monthOfBirth = "July",
+            yearOfBirth = "1995",
+            dayOfBirth = "005",
+            dayWeekOfBirth = "Wednesday",
+            currentAdress = "Unter den Linden",
+            state = "NCR",
+            city = "Gurgaon",
+            picture = "qa.jpg";
 
     @Test
     void successfulPracticeForm() {
-        String firstName = "Dmitry",
-                lastName = "Rejman",
-                userEmail = "bgdt@gmail.com",
-                userNumber = "9527776556",
-                userGender = "Male",
-                userSubjects = "Computer Science",
-                userHobbies = "Sports",
-                currentAdress = "Unter den Linden",
-                picture = "src/test/resources/img/qa.jpg";
 
         open("https://demoqa.com/automation-practice-form");
-
+        $(".practice-form-wrapper").shouldHave(text("Student Registration Form"));
         // input Name
-        $("#firstName").setValue(firstName);
-        $("#lastName").setValue(lastName);
+        $("#firstName").val(firstName);
+        $("#lastName").val(lastName);
 
         // input Email
-        $("#userEmail").setValue(userEmail);
+        $("#userEmail").val(userEmail);
 
         // select Gender
-        $(byText(userGender)).click();
+        $("#genterWrapper").$(byText(userGender)).click();
 
         // input Mobile
-        $("#userNumber").setValue(userNumber);
+        $("#userNumber").val(userNumber);
 
         // select Date of Birth
         $("#dateOfBirthInput").click();
-        $(".react-datepicker__month-select").selectOption("July");
-        $(".react-datepicker__year-select").selectOption("1995");
-        $("[aria-label='Choose Wednesday, July 5th, 1995']").click();
+        $(".react-datepicker__month-select").selectOption(monthOfBirth);
+        $(".react-datepicker__year-select").selectOption(yearOfBirth);
+        $(String.format(".react-datepicker__day--%s:not(.react-datepicker__day--outside-month)", dayOfBirth)).click();
 
         // input Subjects
-        $("#subjectsInput").setValue(userSubjects).pressEnter();
+        $("#subjectsInput").val(userSubjects).pressEnter();
 
         // select Hobbies
-        $(byText(userHobbies)).click();
+        $("#hobbiesWrapper").$(byText(userHobbies)).click();
 
         // select Picture
-        $("#uploadPicture").uploadFile(new File(picture));
+        $("#uploadPicture").uploadFile(new File("src/test/resources/img/" + picture));
 
         // input Current Address
-        $("[placeholder=\"Current Address\"]").setValue(currentAdress);
+        $("#currentAddress").val(currentAdress);
 
         // select state and city
         $("#state").click();
-        $(byText("NCR")).click();
+        $("#stateCity-wrapper").$(byText(state)).click();
         $("#city").click();
-        $(byText("Gurgaon")).click();
-        $(byText("Submit")).click();
+        $("#stateCity-wrapper").$(byText(city)).click();
+        $("#submit").click();
 
         // check Table
-        $(".table-responsive").shouldHave(
-                text(firstName), text(lastName),
-                text(userEmail), text("Male"),
-                text(userNumber), text("05 July,1995"),
-                text("Computer Science"), text("Sports"),
-                text("qa.jpg"), text("NCR"), text("Gurgaon"));
+        $("#example-modal-sizes-title-lg").shouldHave(text("Thanks for submitting the form"));
+        $x("//td[text()='Student Name']").parent().shouldHave(text(firstName + " " + lastName));
+        $x("//td[text()='Student Email']").parent().shouldHave(text(userEmail));
+        $x("//td[text()='Gender']").parent().shouldHave(text(userGender));
+        $x("//td[text()='Mobile']").parent().shouldHave(text(userNumber));
+        $x("//td[text()='Date of Birth']").parent().shouldHave(text("05" + " " + monthOfBirth + "," + yearOfBirth));
+        $x("//td[text()='Subjects']").parent().shouldHave(text(userSubjects));
+        $x("//td[text()='Hobbies']").parent().shouldHave(text(userHobbies));
+        $x("//td[text()='Picture']").parent().shouldHave(text(picture));
+        $x("//td[text()='Address']").parent().shouldHave(text(currentAdress));
+        $x("//td[text()='State and City']").parent().shouldHave(text(state + " " + city));
+
     }
 }
